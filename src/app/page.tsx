@@ -39,7 +39,13 @@ export default function Home() {
 
   return (
     <>
-      <section className="w-full h-[768px] bg-slate-400"></section>
+      <section className="w-full sm:h-[768px] h-[384px] bg-slate-400">
+        <div className="flex items-center justify-center h-full">
+          <h2 className="sm:text-6xl text-3xl font-extrabold text-center">
+            Buy your <span className="text-red-500">dream</span> car{" "}
+          </h2>
+        </div>
+      </section>
 
       <div className="max-w-7xl mx-auto flex flex-col md:flex-col lg:flex-row xl:flex-row py-10 px-6 sm:space-x-5 space-x-0 space-y-5 sm:space-y-0">
         <div className="max-w-4xl flex-1 border">
