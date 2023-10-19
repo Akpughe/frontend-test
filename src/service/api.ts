@@ -9,8 +9,10 @@ export const getPopularBrands = async () => {
   return response.data;
 };
 
-export const getAllCars = async () => {
-  const response = await axios.get(`${API_URL_PROD}/inventory/car/search`);
+export const getAllCars = async (page: number) => {
+  const response = await axios.get(
+    `${API_URL_PROD}/inventory/car/search?currentPage=${page}`
+  );
 
   return response.data;
 };

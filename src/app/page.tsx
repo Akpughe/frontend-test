@@ -6,16 +6,23 @@ import { formatNumber } from "../../helpers";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { ICar } from "@/types";
+import { useEffect, useState } from "react";
+import { Pagination, Modal } from "@mantine/core";
 
 export default function Home() {
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const brandsQuery = useQuery({
     queryKey: ["brands"],
     queryFn: getPopularBrands,
   });
 
-  const carsQuery = useQuery({
-    queryKey: ["cars"],
-    queryFn: getAllCars,
+  const carsQuery: any = useQuery({
+    queryKey: ["cars", { page }],
+    queryFn: () => getAllCars(page),
+    /*@ts-ignore*/
+    keepPreviousData: true,
   });
 
   if (brandsQuery.isLoading) return <h1>Loading...</h1>;
@@ -28,7 +35,9 @@ export default function Home() {
   const brandList = brandsQuery.data?.makeList;
 
   const carList = carsQuery.data?.result;
+  const paginate = carsQuery.data?.pagination;
 
+  console.log("list", paginate);
   return (
     <>
       <section className="w-full h-[768px] bg-slate-400"></section>
@@ -38,7 +47,15 @@ export default function Home() {
           {/* Brands */}
           <BrandList text={"popular brands"} list={brandList} />
           {/* Cars */}
-          <CarList text={`All Cars`} list={carList} />
+          <CarList
+            text={`All Cars`}
+            list={carList}
+            page={page}
+            setPage={setPage}
+            totalPages={totalPages}
+            setTotalPages={setTotalPages}
+            paginate={paginate}
+          />
         </div>
         <div className="max-w-sm w-2/5 border">2</div>
       </div>
@@ -73,8 +90,19 @@ const BrandList = ({ text, list }: any) => {
   );
 };
 
-const CarList = ({ text, list }: any) => {
+const CarList = ({
+  text,
+  list,
+  page,
+  setPage,
+  totalPages,
+  setTotalPages,
+  paginate,
+}: any) => {
   const router = useRouter();
+  useEffect(() => {
+    setTotalPages(paginate.total);
+  }, []);
   return (
     <div className="brands_box p-4 md:p-8 lg:p-12 xl:p-12 mt-10">
       <h4 className="text-center sm:text-4xl text-2xl font-semibold capitalize">
@@ -121,6 +149,12 @@ const CarList = ({ text, list }: any) => {
               </div>
             );
           })}
+          <Pagination
+            value={page}
+            siblings={3}
+            onChange={setPage}
+            total={totalPages}
+          />
         </div>
       </div>
     </div>
