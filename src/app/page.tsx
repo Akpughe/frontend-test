@@ -37,12 +37,11 @@ export default function Home() {
   const carList = carsQuery.data?.result;
   const paginate = carsQuery.data?.pagination;
 
-  console.log("list", paginate);
   return (
     <>
       <section className="w-full h-[768px] bg-slate-400"></section>
 
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-col lg:flex-row xl:flex-row py-10 px-6 space-x-5">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-col lg:flex-row xl:flex-row py-10 px-6 sm:space-x-0 space-x-5 space-y-0 sm:space-y-5">
         <div className="max-w-4xl flex-1 border">
           {/* Brands */}
           <BrandList text={"popular brands"} list={brandList} />
@@ -57,7 +56,20 @@ export default function Home() {
             paginate={paginate}
           />
         </div>
-        <div className="max-w-sm w-2/5 border">2</div>
+        <div className="max-w-sm w-2/5 border">
+          <div className="p-5">
+            <h3 className="text-xl font-semibold">Top Brands</h3>
+            <ul className="pt-5">
+              {brandList.map((brand: any) => {
+                return (
+                  <li key={brand.id}>
+                    <a className="text-lg font-regular">{brand.name}</a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
       </div>
     </>
   );
