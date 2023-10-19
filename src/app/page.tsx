@@ -41,7 +41,7 @@ export default function Home() {
     <>
       <section className="w-full h-[768px] bg-slate-400"></section>
 
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-col lg:flex-row xl:flex-row py-10 px-6 sm:space-x-0 space-x-5 space-y-0 sm:space-y-5">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-col lg:flex-row xl:flex-row py-10 px-6 sm:space-x-5 space-x-0 space-y-5 sm:space-y-0">
         <div className="max-w-4xl flex-1 border">
           {/* Brands */}
           <BrandList text={"popular brands"} list={brandList} />
