@@ -2,18 +2,10 @@
 import Image from "next/image";
 import { Carousel } from "@mantine/carousel";
 import { getPopularBrands, getAllCars, getCarDetails } from "@/service/api";
-import { useState } from "react";
 import { formatNumber } from "../../helpers";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-
-interface Car {
-  id: string;
-  title: string;
-  year: string;
-  imageUrl: string;
-  marketplacePrice: number;
-  marketplaceOldPrice: number;
-}
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { ICar } from "@/types";
 
 export default function Home() {
   const brandsQuery = useQuery({
@@ -41,7 +33,7 @@ export default function Home() {
     <>
       <section className="w-full h-[768px] bg-slate-400"></section>
 
-      <div className="max-w-7xl mx-auto flex py-10 px-6 space-x-5">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-col lg:flex-row xl:flex-row py-10 px-6 space-x-5">
         <div className="max-w-4xl flex-1 border">
           {/* Brands */}
           <BrandList text={"popular brands"} list={brandList} />
@@ -56,11 +48,13 @@ export default function Home() {
 
 const BrandList = ({ text, list }: any) => {
   return (
-    <div className="brands_box p-12">
-      <h4 className="text-center text-4xl font-semibold capitalize">{text}</h4>
+    <div className="brands_box p-4 md:p-8 lg:p-12 xl:p-12">
+      <h4 className="text-center sm:text-4xl text-2xl font-semibold capitalize">
+        {text}
+      </h4>
 
-      <div className="pt-10 flex items-center">
-        <div className="grid grid-cols-5 grid-rows-auto gap-8">
+      <div className="pt-10 flex justify-center items-center">
+        <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5 grid-rows-auto gap-8">
           {list.map((imgs: any) => {
             return (
               <div key={imgs.id} className="flex items-center cursor-pointer">
@@ -80,28 +74,36 @@ const BrandList = ({ text, list }: any) => {
 };
 
 const CarList = ({ text, list }: any) => {
+  const router = useRouter();
   return (
-    <div className="brands_box p-12 mt-10">
-      <h4 className="text-center text-4xl font-semibold capitalize">{text}</h4>
+    <div className="brands_box p-4 md:p-8 lg:p-12 xl:p-12 mt-10">
+      <h4 className="text-center sm:text-4xl text-2xl font-semibold capitalize">
+        {text}
+      </h4>
 
       <div className="pt-10 flex items-center">
-        <div className="grid grid-cols-2 grid-rows-auto gap-4">
-          {list?.map((car: Car) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 grid-rows-auto gap-4">
+          {list?.map((car: ICar) => {
+            const carId = car.id;
             return (
               <div key={car.id} className="flex flex-col cursor-pointer">
-                <div className="">
+                <div className=" h-72 overflow-clip ">
                   <Image
                     src={car.imageUrl}
                     alt={car.title}
                     width={373}
-                    height={224}
-                    // className="object-cover"
+                    height={1}
+                    blurDataURL="data:image/webp;base64,UklGRpICAABXRUJQVlA4WAoAAAAgAAAA0QAAjQAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZWUDggpAAAAPAKAJ0BKtIAjgA+7Xa3VqmnJSOgSAEwHYlpbt1f4QBPa9FXCDIIaqlDjkcW1zB1d70ZjI2/1X+nrOHXzHuDEfwlXBaYDtQaamv0XOtAKbucrSk/jxHiLm7lIaBTuTIlMAD+3hlSngd1wvIK7WOcdrwOOgUaYxTOMOtpqMuDDhxV99uSMGPOaGVvXp+Hvme8q9ymFPxWXqB6QQfT1+a0pmibhAAA"
+                    placeholder="blur"
+                    className="object-cover h-full w-full"
                   />
                 </div>
-                <div className="py-4">
-                  <h4 className="text-xl font-bold ">
-                    {car.title + " " + car.title}
-                  </h4>
+                <div className="py-4 h-44 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-xl font-bold ">
+                      {car.title + " " + car.title}
+                    </h4>
+                  </div>
                   <div className="flex space-x-5">
                     <p className="text-red-500">
                       ₦ {formatNumber(car.marketplacePrice)}
@@ -110,7 +112,9 @@ const CarList = ({ text, list }: any) => {
                       ₦ {formatNumber(car.marketplaceOldPrice)}
                     </p>
                   </div>
-                  <button className="text-white bg-[#0879c9] w-full h-12 flex items-center justify-center mt-4">
+                  <button
+                    onClick={() => router.push(`/car/${carId}`)}
+                    className="text-white bg-[#0879c9] w-full h-12 flex items-center justify-center mt-4">
                     <span className="capitalize">see details</span>
                   </button>
                 </div>
