@@ -10,7 +10,7 @@ function Providers({ children }: React.PropsWithChildren) {
 
   return (
     <QueryClientProvider client={client}>
-      <MantineProvider>{children}</MantineProvider>
+      <MantineProvider defaultColorScheme="light">{children}</MantineProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

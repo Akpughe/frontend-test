@@ -81,12 +81,16 @@ const CarList = ({ text, page, setPage, totalPages, setTotalPages }: any) => {
   const carList = data?.result;
   const paginate = data?.pagination;
 
-  isLoading && <h1>Loading...</h1>;
-  error && <pre>{JSON.stringify(error)}</pre>;
-
   useEffect(() => {
     setTotalPages(paginate?.total);
   }, []);
+
+  if (isLoading) {
+    return <h1>Loading...</h1>;
+  }
+  if (error) {
+    <pre>{JSON.stringify(error)}</pre>;
+  }
   return (
     <div className="brands_box p-4 md:p-8 lg:p-12 xl:p-12 mt-10">
       <h4 className="text-center sm:text-4xl text-2xl font-semibold capitalize">

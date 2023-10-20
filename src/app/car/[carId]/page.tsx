@@ -16,13 +16,17 @@ const CarInfo = ({ params }: Props) => {
 
   const { isLoading, error, data } = useCarDetails({ carId });
 
-  isLoading && <h1>Loading...</h1>;
-  error && <pre>{JSON.stringify(error)}</pre>;
-
   const carInfo: ICar = data?.data;
 
   const location =
     carInfo?.city + ", " + carInfo?.state + ", " + carInfo?.country;
+
+  if (isLoading) {
+    return <h1>Loading...</h1>;
+  }
+  if (error) {
+    <pre>{JSON.stringify(error)}</pre>;
+  }
 
   return (
     <div className="max-w-6xl mx-auto">
