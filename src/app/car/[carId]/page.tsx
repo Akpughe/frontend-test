@@ -1,12 +1,11 @@
 "use client";
 import React from "react";
-import { getCarDetails, getCarMedia } from "@/service/api";
-import { formatNumber } from "../../../../helpers";
-import { useQuery } from "@tanstack/react-query";
+import formatCurrency from "@/utils/format-currency";
 import { Carousel } from "@mantine/carousel";
 import Image from "next/image";
-import { ICar, ICarMedia } from "@/types";
+import { ICar, ICarMedia } from "@/index";
 import { Rating } from "@mantine/core";
+import { useCarDetails, useCarMedia } from "@/hooks/use-cars";
 
 type Props = {
   params: { carId: string };
@@ -15,28 +14,91 @@ type Props = {
 const CarInfo = ({ params }: Props) => {
   const { carId } = params;
 
-  const carQuery = useQuery({
-    queryKey: ["car", carId],
-    queryFn: () => getCarDetails(carId),
-  });
+  const { isLoading, error, data } = useCarDetails({ carId });
 
-  const carMediaQuery = useQuery({
-    queryKey: ["carMedia", carId],
-    queryFn: () => getCarMedia(carId),
-  });
+  isLoading && <h1>Loading...</h1>;
+  error && <pre>{JSON.stringify(error)}</pre>;
 
-  if (carQuery.isLoading) return <h1>Loading...</h1>;
-  if (carQuery.isError) return <pre>{JSON.stringify(carQuery.error)}</pre>;
+  const carInfo: ICar = data?.data;
 
-  if (carMediaQuery.isLoading) return <h1>Loading...</h1>;
-  if (carMediaQuery.isError) return <pre>{JSON.stringify(carQuery.error)}</pre>;
+  const location =
+    carInfo?.city + ", " + carInfo?.state + ", " + carInfo?.country;
 
-  const mediaList = carMediaQuery.data?.carMediaList;
-  const carInfo: ICar = carQuery.data;
+  return (
+    <div className="max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-col lg:flex-row xl:flex-row">
+        {/* car pictures */}
+        <div className="flex flex-1">
+          <div className="h-full ">
+            <CarCarousel carId={carId} />
+          </div>
+        </div>
+        {/* car details */}
+        <div className="flex-1">
+          <div className="p-5">
+            <div>
+              <h4 className="text-3xl font-bold">{carInfo?.carName}</h4>
+              <div className="grid sm:grid-cols-4 grid-cols-3 grid-rows-auto gap-3 pt-4">
+                <Pill text={carInfo?.sellingCondition} />
+                <Pill text={carInfo?.mileage} />
+                <Pill text={carInfo?.engineType} />
+                <Pill text={carInfo?.transmission} />
+              </div>
+              <div className="pt-4 w-3/5">
+                <p className="flex items-center justify-between w-full">
+                  <span className="text-base">Price:</span>
+                  <span className="text-xl font-bold">
+                    ₦{formatCurrency(carInfo?.marketplacePrice)}
+                  </span>
+                </p>
+                <p className="flex items-center justify-between w-full">
+                  <span className="text-base">Monthly payment:</span>
+                  <span className="text-xl font-bold">
+                    ₦{formatCurrency(carInfo?.installment)}
+                  </span>
+                </p>
+              </div>
 
-  const location = carInfo.city + ", " + carInfo.state + ", " + carInfo.country;
+              <div className="pt-4">
+                Location: <span className="font-semibold">{location}</span>
+              </div>
+              <div className="flex items-center pt-4 space-x-3">
+                <span>Grade: </span>
+                <div>
+                  <Rating value={carInfo?.gradeScore} fractions={2} readOnly />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  const slides = mediaList.map((car: ICarMedia) => (
+      <div className="pt-8 px-5 md:px-5 lg:px-0 xl:px-0">
+        <h4 className="font-bold">More Info</h4>
+
+        <div className="pt-4">
+          Interior color:{" "}
+          <span className="font-semibold">{carInfo?.interiorColor}</span>
+        </div>
+
+        <div className="pt-4">
+          Exterior color:{" "}
+          <span className="font-semibold">{carInfo?.exteriorColor}</span>
+        </div>
+
+        <div className="pt-4">
+          Fuel type: <span className="font-semibold">{carInfo?.fuelType}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CarCarousel = ({ carId }: any) => {
+  const { isLoading, error, data } = useCarMedia({ carId });
+  const mediaList = data?.carMediaList;
+
+  const slides = mediaList?.map((car: ICarMedia) => (
     <Carousel.Slide key={car.id}>
       <Image
         src={car.url}
@@ -50,75 +112,17 @@ const CarInfo = ({ params }: Props) => {
     </Carousel.Slide>
   ));
 
+  if (isLoading) {
+    return <h1>Loading...</h1>;
+  }
+  if (error) {
+    <pre>{JSON.stringify(error)}</pre>;
+  }
+
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-col lg:flex-row xl:flex-row">
-        {/* car pictures */}
-        <div className="flex flex-1">
-          <div className="h-full ">
-            <Carousel withIndicators withControls>
-              {slides}
-            </Carousel>
-          </div>
-        </div>
-        {/* car details */}
-        <div className="flex-1">
-          <div className="p-5">
-            <div>
-              <h4 className="text-3xl font-bold">{carInfo.carName}</h4>
-              <div className="grid sm:grid-cols-4 grid-cols-3 grid-rows-auto gap-3 pt-4">
-                <Pill text={carInfo.sellingCondition} />
-                <Pill text={carInfo.mileage} />
-                <Pill text={carInfo.engineType} />
-                <Pill text={carInfo.transmission} />
-              </div>
-              <div className="pt-4 w-3/5">
-                <p className="flex items-center justify-between w-full">
-                  <span className="text-base">Price:</span>
-                  <span className="text-xl font-bold">
-                    ₦{formatNumber(carInfo.marketplacePrice)}
-                  </span>
-                </p>
-                <p className="flex items-center justify-between w-full">
-                  <span className="text-base">Monthly payment:</span>
-                  <span className="text-xl font-bold">
-                    ₦{formatNumber(carInfo.installment)}
-                  </span>
-                </p>
-              </div>
-
-              <div className="pt-4">
-                Location: <span className="font-semibold">{location}</span>
-              </div>
-              <div className="flex items-center pt-4 space-x-3">
-                <span>Grade: </span>
-                <div>
-                  <Rating value={carInfo.gradeScore} fractions={2} readOnly />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="pt-8 px-5 md:px-5 lg:px-0 xl:px-0">
-        <h4 className="font-bold">More Info</h4>
-
-        <div className="pt-4">
-          Interior color:{" "}
-          <span className="font-semibold">{carInfo.interiorColor}</span>
-        </div>
-
-        <div className="pt-4">
-          Exterior color:{" "}
-          <span className="font-semibold">{carInfo.exteriorColor}</span>
-        </div>
-
-        <div className="pt-4">
-          Fuel type: <span className="font-semibold">{carInfo.fuelType}</span>
-        </div>
-      </div>
-    </div>
+    <Carousel withIndicators withControls>
+      {slides}
+    </Carousel>
   );
 };
 

@@ -25,3 +25,9 @@ export interface ICarMedia {
   name: string;
   url: string;
 }
+
+export interface IBrand {
+  id: string;
+  name: string;
+  imageUrl: string;
+}
